@@ -38,7 +38,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
             bucketsData.push({
                 bucketId,
                 averageSkill,
-                users: users.map(user => user.user_id),
+                users,
             });
             console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
         }
@@ -170,15 +170,17 @@ async function getUsersInBucket(tableName, bucketId) {
         ExpressionAttributeValues: {
             ":bucketId": bucketId,
         },
+        ProjectionExpression: "user_id", // Only fetch the user_id attribute
     };
 
-    let users = [];
+    let userIDs = [];
     let items;
     do {
         items = await documentClient.scan(params).promise();
-        users.push(...items.Items);
+        // Directly map user_id from items to userIDs array
+        userIDs.push(...items.Items.map(item => item.user_id));
         params.ExclusiveStartKey = items.LastEvaluatedKey;
     } while (items.LastEvaluatedKey);
 
-    return users;
+    return userIDs;
 }
