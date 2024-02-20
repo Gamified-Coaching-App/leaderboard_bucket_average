@@ -6,12 +6,6 @@ const documentClient = new AWS.DynamoDB.DocumentClient();
 export async function handler(event) {
     try {
         await prepareAndTriggerChallengeGeneration(event);
-
-        // Only return the success message if no error was thrown
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ message: "Successfully triggered challenge generation." }),
-        };
     } catch (error) {
         console.error("Error in handler:", error);
 
@@ -24,7 +18,7 @@ export async function handler(event) {
 }
 
 async function prepareAndTriggerChallengeGeneration(event) {
-    const tableNameLeaderboard = "leaderboard";
+    const tableNameLeaderboard = "leaderboard_mock";
     const seasonLengthDays = 28;
 
     try {
