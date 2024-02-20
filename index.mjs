@@ -3,10 +3,11 @@ import https from 'https';
 
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = async (event) => {
+export async function handler(event) {
     try {
         await prepareAndTriggerChallengeGeneration(event);
 
+        // Only return the success message if no error was thrown
         return {
             statusCode: 200,
             body: JSON.stringify({ message: "Successfully triggered challenge generation." }),
@@ -14,12 +15,13 @@ exports.handler = async (event) => {
     } catch (error) {
         console.error("Error in handler:", error);
 
+        // Return an error response if an error is caught
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: "Failed to trigger challenge generation." }),
+            body: JSON.stringify({ error: "Failed to trigger challenge generation due to an internal error." }),
         };
     }
-};
+}
 
 async function prepareAndTriggerChallengeGeneration(event) {
     const tableNameLeaderboard = "leaderboard";
