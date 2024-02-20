@@ -3,29 +3,8 @@ import https from 'https';
 
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
-export async function handler(event) {
-    try {
-        await prepareAndTriggerChallengeGeneration(event);
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ message: "Successfully triggered challenge generation." }),
-        };
-    } catch (error) {
-        console.error("Error in handler:", error);
-
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Failed to trigger challenge generation." }),
-        };
-    }
-}
-
-
-// Function to calculate average skill and gather necessary data for challenge generation
 async function prepareAndTriggerChallengeGeneration(event) {
     const tableNameLeaderboard = "leaderboard";
-
     const seasonLengthDays = 28;
 
     try {
@@ -33,29 +12,36 @@ async function prepareAndTriggerChallengeGeneration(event) {
         let bucketsData = [];
 
         for (const bucketId of uniqueBuckets) {
+            if (!bucketId) {
+                console.error("Encountered undefined bucketId in uniqueBuckets");
+                continue; 
+            }
             const averageSkill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucketId, seasonLengthDays);
             const users = await getUsersInBucket(tableNameLeaderboard, bucketId);
 
             bucketsData.push({
                 bucketId,
                 averageSkill,
-                users: users.map(user => user.user_id)
+                users: users.map(user => user.user_id),
             });
         }
 
         const payload = {
-            season_id: "season_2024_02", 
-            start_date: "2024-02-01", 
-            end_date: "2024-02-28", 
-            buckets: bucketsData
+            season_id: "season_2024_02",
+            start_date: "2024-02-01",
+            end_date: "2024-02-28",
+            buckets: bucketsData,
         };
 
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
 
+        // Make an API call to trigger challenge creation
         await makeApiCall(apiUrl, payload);
 
     } catch (error) {
         console.error("Error preparing data for challenge generation:", error);
+        // Rethrow the error to ensure it's caught by the calling function's catch block
+        throw error;
     }
 }
 
