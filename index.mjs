@@ -5,10 +5,10 @@ const documentClient = new AWS.DynamoDB.DocumentClient();
 
 export async function handler(event) {
     try {
-        await prepareAndTriggerChallengeGeneration(event);
+        const response = await prepareAndTriggerChallengeGeneration(event);
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Successfully triggered challenge generation." }),
+            body: JSON.stringify({ message: "Successfully triggered challenge generation.", response }),
         };
     } catch (error) {
         console.error("Error in handler:", error);
@@ -16,7 +16,7 @@ export async function handler(event) {
         // Return an error response if an error is caught
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: "Failed to trigger challenge generation due to an internal error." }),
+            body: JSON.stringify({ error: "Failed to trigger challenge generation due to an internal error.", details: error.message }),
         };
     }
 }
@@ -54,8 +54,9 @@ async function prepareAndTriggerChallengeGeneration(event) {
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
 
         // Make an API call to trigger challenge creation
-        await makeApiCall(apiUrl, payload);
-
+        const apiResponse = await makeApiCall(apiUrl, payload);
+        console.log("API call response:", apiResponse);
+        return apiResponse;
     } catch (error) {
         console.error("Error preparing data for challenge generation:", error);
         // Rethrow the error to ensure it's caught by the calling function's catch block
@@ -71,8 +72,8 @@ async function makeApiCall(url, payload) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Content-Length': dataString.length
-            }
+                'Content-Length': dataString.length,
+            },
         };
 
         const req = https.request(url, options, (res) => {
@@ -83,12 +84,20 @@ async function makeApiCall(url, payload) {
             });
 
             res.on('end', () => {
-                resolve(JSON.parse(response));
+                console.log("API call ended with response:", response);
+                try {
+                    const jsonResponse = JSON.parse(response);
+                    resolve(jsonResponse);
+                } catch (parseError) {
+                    console.error("Error parsing API response:", parseError);
+                    reject(parseError);
+                }
             });
         });
 
         req.on('error', (e) => {
-            reject(e.message);
+            console.error("API call error:", e);
+            reject(e);
         });
 
         // Send the request with the payload
@@ -96,6 +105,7 @@ async function makeApiCall(url, payload) {
         req.end();
     });
 }
+
 
 async function getAllUniqueBuckets(tableName) {
     let uniqueBuckets = new Set(); 
