@@ -6,10 +6,6 @@ const documentClient = new AWS.DynamoDB.DocumentClient();
 export async function handler(event) {
     try {
         const response = await prepareAndTriggerChallengeGeneration(event);
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ message: "Successfully triggered challenge generation.", response }),
-        };
     } catch (error) {
         console.error("Error in handler:", error);
 
@@ -35,7 +31,9 @@ async function prepareAndTriggerChallengeGeneration(event) {
                 continue; 
             }
             const averageSkill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucketId, seasonLengthDays);
+            console.log(`averageSkill: ${JSON.stringify(averageSkill, null, 2)}`);
             const users = await getUsersInBucket(tableNameLeaderboard, bucketId);
+            console.log(`Users: ${JSON.stringify(users, null, 2)}`);
 
             bucketsData.push({
                 bucketId,
@@ -59,7 +57,6 @@ async function prepareAndTriggerChallengeGeneration(event) {
         return apiResponse;
     } catch (error) {
         console.error("Error preparing data for challenge generation:", error);
-        // Rethrow the error to ensure it's caught by the calling function's catch block
         throw error;
     }
 }
@@ -130,6 +127,7 @@ async function getAllUniqueBuckets(tableName) {
 }
 
 async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthDays) {
+    console.log(`Calculating average skill for bucket: ${bucketId}`);
     let totalSkill = 0;
     let userCount = 0;
     let params = {
@@ -139,23 +137,30 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
         ExpressionAttributeValues: { ":bucketId": bucketId },
     };
 
+    console.log(`DynamoDB Query Params: ${JSON.stringify(params)}`);
+
     try {
         let scanResponse;
         do {
             scanResponse = await documentClient.scan(params).promise();
-            scanResponse.Items.forEach(item => {
-                totalSkill += item.aggregate_skills_season;
-                userCount += 1;
-            });
+            if(scanResponse.Items.length > 0) {
+                scanResponse.Items.forEach(item => {
+                    totalSkill += item.aggregate_skills_season;
+                    userCount += 1;
+                });
+            } else {
+                console.log(`No items found for bucketId ${bucketId}`);
+            }
             params.ExclusiveStartKey = scanResponse.LastEvaluatedKey; 
         } while (scanResponse.LastEvaluatedKey);
 
         return userCount > 0 ? (totalSkill / userCount) / seasonLengthDays : 0;
     } catch (error) {
         console.error(`Error calculating average skill for bucket ${bucketId}:`, error);
-        throw error; 
+        throw error;
     }
 }
+
 
 async function getUsersInBucket(tableName, bucketId) {
     const params = {
