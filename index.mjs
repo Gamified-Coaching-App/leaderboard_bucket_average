@@ -26,6 +26,8 @@ export async function handler(event) {
 async function prepareAndTriggerChallengeGeneration(event) {
     const tableNameLeaderboard = "leaderboard";
 
+    const seasonLengthDays = 28;
+
     try {
         const uniqueBuckets = await getAllUniqueBuckets(tableNameLeaderboard);
         let bucketsData = [];
@@ -91,7 +93,6 @@ async function makeApiCall(url, payload) {
     });
 }
 
-// Include the implementation of getAllUniqueBuckets, calculateAverageSkillForBucket, and getUsersInBucket functions as needed
 async function getAllUniqueBuckets(tableName) {
     let uniqueBuckets = new Set(); 
     let params = {
