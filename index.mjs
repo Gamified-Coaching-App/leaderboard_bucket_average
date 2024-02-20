@@ -3,6 +3,24 @@ import https from 'https';
 
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
+exports.handler = async (event) => {
+    try {
+        await prepareAndTriggerChallengeGeneration(event);
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Successfully triggered challenge generation." }),
+        };
+    } catch (error) {
+        console.error("Error in handler:", error);
+
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Failed to trigger challenge generation." }),
+        };
+    }
+};
+
 async function prepareAndTriggerChallengeGeneration(event) {
     const tableNameLeaderboard = "leaderboard";
     const seasonLengthDays = 28;
