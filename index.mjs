@@ -6,6 +6,10 @@ const documentClient = new AWS.DynamoDB.DocumentClient();
 export async function handler(event) {
     try {
         await prepareAndTriggerChallengeGeneration(event);
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Successfully triggered challenge generation." }),
+        };
     } catch (error) {
         console.error("Error in handler:", error);
 
