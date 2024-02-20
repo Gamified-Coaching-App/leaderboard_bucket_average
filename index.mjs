@@ -40,6 +40,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
                 averageSkill,
                 users: users.map(user => user.user_id),
             });
+            console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
         }
 
         const payload = {
