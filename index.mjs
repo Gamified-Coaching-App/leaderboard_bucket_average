@@ -162,6 +162,7 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
     const userIds = getUsersInBucket(tableName, bucketId);
     const userIdsJSON = JSON.stringify({ user_ids: userIds });
     const userCount = (await userIds).length;
+    console.log(userIdsJSON);
 
     // pass as payload into API call
     const apiResponse = await makeApiCall("https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate", userIdsJSON);
