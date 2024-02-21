@@ -23,31 +23,31 @@ async function prepareAndTriggerChallengeGeneration(event) {
 
     try {
         const uniqueBuckets = await getAllUniqueBuckets(tableNameLeaderboard);
-        let bucketsData = [];
+        let buckets_data = [];
 
-        for (const bucketId of uniqueBuckets) {
-            if (!bucketId) {
+        for (const bucket_id of uniqueBuckets) {
+            if (!bucket_id) {
                 console.error("Encountered undefined bucketId in uniqueBuckets");
                 continue; 
             }
-            const averageSkill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucketId, seasonLengthDays);
-            console.log(`averageSkill: ${JSON.stringify(averageSkill, null, 2)}`);
-            const users = await getUsersInBucket(tableNameLeaderboard, bucketId);
-            console.log(`Users: ${JSON.stringify(users, null, 2)}`);
+            const average_skill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucket_id, seasonLengthDays);
+            // console.log(`averageSkill: ${JSON.stringify(averageSkill, null, 2)}`);
+            const users = await getUsersInBucket(tableNameLeaderboard, bucket_id);
+            // console.log(`Users: ${JSON.stringify(users, null, 2)}`);
 
-            bucketsData.push({
-                bucketId,
-                averageSkill,
+            buckets_data.push({
+                bucket_id,
+                average_skill,
                 users,
             });
-            console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
+            // console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
         }
 
         const payload = {
             season_id: "season_2024_02",
             start_date: "2024-02-01",
             end_date: "2024-02-28",
-            buckets: bucketsData,
+            buckets: buckets_data,
         };
 
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
