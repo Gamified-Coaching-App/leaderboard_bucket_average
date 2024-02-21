@@ -76,7 +76,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
             endDate: seasonEnd,
             buckets: bucketsData,
         };
-
+        console.log(payload);
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
 
         // Make an API call to trigger challenge creation
