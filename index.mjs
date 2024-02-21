@@ -23,6 +23,7 @@ export async function handler(event) {
 }
 
 async function prepareAndTriggerChallengeGeneration(event) {
+    console.log("prepareAndTriggerChallengeGeneration triggered");
     const tableNameLeaderboard = "leaderboard";
     const seasonLengthDays = 28;
 
@@ -90,6 +91,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
 
 // Function to make a POST request API call
 async function makeApiCall(url, payload) {
+    console.log("makeApiCall triggered");
     return new Promise((resolve, reject) => {
         const dataString = JSON.stringify(payload);
         const options = {
@@ -132,6 +134,7 @@ async function makeApiCall(url, payload) {
 
 
 async function getAllUniqueBuckets(tableName) {
+    console.log("getAllUniqueBuckets triggered");
     let uniqueBuckets = new Set();
     let params = {
         TableName: tableName,
@@ -154,6 +157,7 @@ async function getAllUniqueBuckets(tableName) {
 }
 
 async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthDays) {
+    console.log("calculateAverageSkillForBucket triggered");
     // retrieve user_ids from a given bucketID
     const userIds = getUsersInBucket(tableName, bucketId);
     const userIdsJSON = JSON.stringify({ user_ids: userIds });
@@ -161,7 +165,7 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
 
     // pass as payload into API call
     const apiResponse = await makeApiCall("https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate", userIdsJSON);
-
+    console.log(apiResponse);
     // Extract values and convert them to numbers
     const values = Object.values(apiResponse).map(value => parseInt(value, 10));
 
@@ -208,6 +212,7 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
 
 
 async function getUsersInBucket(tableName, bucketId) {
+    console.log("getUsersInBucket triggered");
     const params = {
         TableName: tableName,
         FilterExpression: "bucket_id = :bucketId",
