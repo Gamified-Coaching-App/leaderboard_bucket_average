@@ -94,12 +94,20 @@ async function makeApiCall(url, payload) {
     console.log("makeApiCall triggered");
     return new Promise((resolve, reject) => {
         const dataString = JSON.stringify(payload);
+        // const options = {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Content-Length': dataString.length,
+        //     },
+        // };
         const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Content-Length': dataString.length,
+                // 'Content-Length': dataString.length,
             },
+            body: payload
         };
 
         const req = https.request(url, options, (res) => {
