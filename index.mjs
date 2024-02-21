@@ -53,7 +53,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
         const currentDate = new Date();
         const year = currentDate.getFullYear(); // Full year (e.g., 2024)
         let month = currentDate.getMonth() + 1; // Month (0-11), add 1 to get the correct month (1-12)
-        let day = currentDate.getDate(); // Day of the month (1-31)
+        let day = 1; // Day of the month (1-31)
         const seasonEndDay = day + seasonLengthDays - 1;
 
         // Add leading zeros if needed
@@ -163,6 +163,8 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
     const userIdsJSON = JSON.stringify({ user_ids: userIds });
     const userCount = (await userIds).length;
     console.log(userIdsJSON);
+    console.log(userIds);
+    console.log(typeof userIds);
 
     // pass as payload into API call
     const apiResponse = await makeApiCall("https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate", userIdsJSON);
