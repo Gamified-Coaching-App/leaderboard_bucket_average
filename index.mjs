@@ -46,7 +46,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
                 average_skill: averageSkill,
                 users,
             });
-            console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
+            //console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
         }
 
         // Get dates for payload
@@ -68,7 +68,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
         // Format the date as "YYYY-MM-DD"
         const seasonStart = `${year}-${month}-${day}`;
         const seasonEnd = `${year}-${month}-${seasonEndDay}`;
-        console.log(seasonIdString, seasonStart, seasonEnd);
+        //console.log(seasonIdString, seasonStart, seasonEnd);
 
         const payload = {
             seasonId: seasonIdString,
@@ -81,7 +81,8 @@ async function prepareAndTriggerChallengeGeneration(event) {
 
         // Make an API call to trigger challenge creation
         // const apiResponse = await makeApiCall(apiUrl, payload);
-        const apiResponse = await makeApiCall(apiUrl, JSON.stringify(payload));
+        //const apiResponse = await makeApiCall(apiUrl, JSON.stringify(payload));
+        const apiResponse = await fetchApiData(apiUrl, JSON.stringify(payload));
         console.log("API call response:", apiResponse);
         return apiResponse;
     } catch (error) {
@@ -142,30 +143,30 @@ async function makeApiCall(url, payload) {
 }
 
 
-
+// Function to make a POST request API call
 async function fetchApiData(url, payload) {
-     
+
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: payload
-      });
-  
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-  
-      const responseData = await response.json();
-  
-      return responseData; // Return the response data
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: payload
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const responseData = await response.json();
+
+        return responseData; // Return the response data
     } catch (error) {
-      console.error('There was a problem with the request:', error);
-      throw error; // Rethrow the error for handling at higher level
+        console.error('There was a problem with the request:', error);
+        throw error; // Rethrow the error for handling at higher level
     }
-  }
+}
 
 async function getAllUniqueBuckets(tableName) {
     console.log("getAllUniqueBuckets triggered");
@@ -208,7 +209,7 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
 
     // Extract values and convert them to numbers
     const values = Object.values(apiResponse).map(value => parseInt(value, 10));
-
+    console.log("Values: ", values);
     // Calculate the average
     const average = values.reduce((sum, value) => sum + value, 0) / values.length;
 
