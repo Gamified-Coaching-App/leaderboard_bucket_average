@@ -77,14 +77,14 @@ async function prepareAndTriggerChallengeGeneration(event) {
             buckets: bucketsData,
         };
         console.log(payload);
-        JSON.stringify(payload)
+        // JSON.stringify(payload)
 
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
 
         // Make an API call to trigger challenge creation
-        // const apiResponse = await makeApiCall(apiUrl, payload);
+        const apiResponse = await makeApiCall(apiUrl, payload);
         //const apiResponse = await makeApiCall(apiUrl, JSON.stringify(payload));
-        const apiResponse = await fetchApiData(apiUrl, payload);
+        // const apiResponse = await fetchApiData(apiUrl, payload);
         console.log("API call response:", apiResponse);
         return apiResponse;
     } catch (error) {
@@ -98,21 +98,21 @@ async function makeApiCall(url, payload) {
     console.log("makeApiCall triggered");
     return new Promise((resolve, reject) => {
         const dataString = JSON.stringify(payload);
-        // const options = {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Content-Length': dataString.length,
-        //     },
-        // };
         const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                // 'Content-Length': dataString.length,
+                'Content-Length': dataString.length,
             },
-            body: payload
         };
+        // const options = {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         // 'Content-Length': dataString.length,
+        //     },
+        //     body: payload
+        // };
 
         const req = https.request(url, options, (res) => {
             let response = '';
