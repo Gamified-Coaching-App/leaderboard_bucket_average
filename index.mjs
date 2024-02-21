@@ -77,12 +77,14 @@ async function prepareAndTriggerChallengeGeneration(event) {
             buckets: bucketsData,
         };
         console.log(payload);
+        JSON.stringify(payload)
+
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
 
         // Make an API call to trigger challenge creation
         // const apiResponse = await makeApiCall(apiUrl, payload);
         //const apiResponse = await makeApiCall(apiUrl, JSON.stringify(payload));
-        const apiResponse = await fetchApiData(apiUrl, JSON.stringify(payload));
+        const apiResponse = await fetchApiData(apiUrl, payload);
         console.log("API call response:", apiResponse);
         return apiResponse;
     } catch (error) {
@@ -201,7 +203,6 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
     console.log(userIds);
     console.log(typeof userIds);
 
-    // pass as payload into API call
     const apiUrl = "https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate";
 
     // const apiResponse = await makeApiCall(apiUrl, userIdsJSON);
