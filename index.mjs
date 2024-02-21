@@ -18,7 +18,7 @@ export async function handler(event) {
 
     return {
         statusCode: 200,
-        body: JSON.stringify({ message: "Shallenge generation triggered." }),
+        body: JSON.stringify({ message: "Challenge generation triggered." }),
     };
 }
 
@@ -46,7 +46,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
                 average_skill: averageSkill,
                 users,
             });
-            // console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
+            console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
         }
 
         // Get dates for payload
