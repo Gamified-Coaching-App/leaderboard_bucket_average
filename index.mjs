@@ -24,7 +24,7 @@ export async function handler(event) {
 
 async function prepareAndTriggerChallengeGeneration(event) {
     console.log("prepareAndTriggerChallengeGeneration triggered");
-    const tableNameLeaderboard = "leaderboard";
+    const tableNameLeaderboard = "leaderboard_mock";
     const seasonLengthDays = 28;
 
     try {
