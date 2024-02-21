@@ -159,9 +159,9 @@ async function getAllUniqueBuckets(tableName) {
 async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthDays) {
     console.log("calculateAverageSkillForBucket triggered");
     // retrieve user_ids from a given bucketID
-    const userIds = getUsersInBucket(tableName, bucketId);
+    const userIds = await getUsersInBucket(tableName, bucketId);
     const userIdsJSON = JSON.stringify({ user_ids: userIds });
-    const userCount = (await userIds).length;
+    const userCount = userIds.length;
     console.log(userIdsJSON);
     console.log(userIds);
     console.log(typeof userIds);
