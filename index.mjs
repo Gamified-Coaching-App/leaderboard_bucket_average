@@ -80,7 +80,8 @@ async function prepareAndTriggerChallengeGeneration(event) {
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
 
         // Make an API call to trigger challenge creation
-        const apiResponse = await makeApiCall(apiUrl, payload);
+        // const apiResponse = await makeApiCall(apiUrl, payload);
+        const apiResponse = await makeApiCall(apiUrl, JSON.stringify(payload));
         console.log("API call response:", apiResponse);
         return apiResponse;
     } catch (error) {
@@ -141,6 +142,31 @@ async function makeApiCall(url, payload) {
 }
 
 
+
+async function fetchApiData(url, payload) {
+     
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const responseData = await response.json();
+  
+      return responseData; // Return the response data
+    } catch (error) {
+      console.error('There was a problem with the request:', error);
+      throw error; // Rethrow the error for handling at higher level
+    }
+  }
+
 async function getAllUniqueBuckets(tableName) {
     console.log("getAllUniqueBuckets triggered");
     let uniqueBuckets = new Set();
@@ -175,8 +201,11 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
     console.log(typeof userIds);
 
     // pass as payload into API call
-    const apiResponse = await makeApiCall("https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate", userIdsJSON);
-    console.log(apiResponse);
+    const apiUrl = "https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate";
+
+    // const apiResponse = await makeApiCall(apiUrl, userIdsJSON);
+    const apiResponse = await fetchApiData(apiUrl, userIdsJSON);
+
     // Extract values and convert them to numbers
     const values = Object.values(apiResponse).map(value => parseInt(value, 10));
 
