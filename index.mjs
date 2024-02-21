@@ -28,21 +28,21 @@ async function prepareAndTriggerChallengeGeneration(event) {
 
     try {
         const uniqueBuckets = await getAllUniqueBuckets(tableNameLeaderboard);
-        let buckets_data = [];
+        let bucketsData = [];
 
         for (const bucket_id of uniqueBuckets) {
             if (!bucket_id) {
                 console.error("Encountered undefined bucketId in uniqueBuckets");
                 continue; 
             }
-            const average_skill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucket_id, seasonLengthDays);
+            const averageSkill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucket_id, seasonLengthDays);
             // console.log(`averageSkill: ${JSON.stringify(averageSkill, null, 2)}`);
             const users = await getUsersInBucket(tableNameLeaderboard, bucket_id);
             // console.log(`Users: ${JSON.stringify(users, null, 2)}`);
 
-            buckets_data.push({
+            bucketsData.push({
                 bucket_id,
-                average_skill,
+                average_skill: averageSkill,
                 users,
             });
             // console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
@@ -52,6 +52,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
         const year = currentDate.getFullYear(); // Full year (e.g., 2024)
         let month = currentDate.getMonth() + 1; // Month (0-11), add 1 to get the correct month (1-12)
         let day = currentDate.getDate(); // Day of the month (1-31)
+        const seasonEndDay = day + seasonLengthDays - 1;
 
         // Add leading zeros if needed
         if (month < 10) {
@@ -61,15 +62,17 @@ async function prepareAndTriggerChallengeGeneration(event) {
             day = '0' + day;
         }
 
+        const seasonIdString = `season_${year}_${month}`;  
         // Format the date as "YYYY-MM-DD"
-        const season_start = `${year}-${month}-${day}`;
-        const season_id_string = `season_${year}_${month}`;
+        const seasonStart = `${year}-${month}-${day}`;
+        const seasonEnd = `${year}-${month}-${seasonEndDay}`;
+           
 
         const payload = {
-            season_id: season_id_string,
-            start_date: season_start,
-            end_date: "2024-02-28",
-            buckets: buckets_data,
+            seasonId: seasonIdString,
+            startDate: seasonStart,
+            endDate: seasonEnd,
+            buckets: bucketsData,
         };
 
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
