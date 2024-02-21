@@ -15,6 +15,11 @@ export async function handler(event) {
             body: JSON.stringify({ error: "Failed to trigger challenge generation due to an internal error.", details: error.message }),
         };
     }
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ message: "Shallenge generation triggered." }),
+    };
 }
 
 async function prepareAndTriggerChallengeGeneration(event) {
