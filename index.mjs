@@ -33,7 +33,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
         for (const bucket_id of uniqueBuckets) {
             if (!bucket_id) {
                 console.error("Encountered undefined bucketId in uniqueBuckets");
-                continue; 
+                continue;
             }
             const averageSkill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucket_id, seasonLengthDays);
             // console.log(`averageSkill: ${JSON.stringify(averageSkill, null, 2)}`);
@@ -49,6 +49,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
         }
 
         // Get dates for payload
+        const currentDate = new Date();
         const year = currentDate.getFullYear(); // Full year (e.g., 2024)
         let month = currentDate.getMonth() + 1; // Month (0-11), add 1 to get the correct month (1-12)
         let day = currentDate.getDate(); // Day of the month (1-31)
@@ -62,11 +63,11 @@ async function prepareAndTriggerChallengeGeneration(event) {
             day = '0' + day;
         }
 
-        const seasonIdString = `season_${year}_${month}`;  
+        const seasonIdString = `season_${year}_${month}`;
         // Format the date as "YYYY-MM-DD"
         const seasonStart = `${year}-${month}-${day}`;
         const seasonEnd = `${year}-${month}-${seasonEndDay}`;
-           
+        console.log(seasonIdString, seasonStart, seasonEnd);
 
         const payload = {
             seasonId: seasonIdString,
@@ -87,7 +88,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
     }
 }
 
-// Function to make an API call
+// Function to make a POST request API call
 async function makeApiCall(url, payload) {
     return new Promise((resolve, reject) => {
         const dataString = JSON.stringify(payload);
@@ -131,10 +132,10 @@ async function makeApiCall(url, payload) {
 
 
 async function getAllUniqueBuckets(tableName) {
-    let uniqueBuckets = new Set(); 
+    let uniqueBuckets = new Set();
     let params = {
         TableName: tableName,
-        ProjectionExpression: "bucket_id", 
+        ProjectionExpression: "bucket_id",
     };
 
     try {
@@ -142,49 +143,67 @@ async function getAllUniqueBuckets(tableName) {
         do {
             scanResponse = await documentClient.scan(params).promise();
             scanResponse.Items.forEach(item => uniqueBuckets.add(item.bucket_id));
-            params.ExclusiveStartKey = scanResponse.LastEvaluatedKey; 
+            params.ExclusiveStartKey = scanResponse.LastEvaluatedKey;
         } while (scanResponse.LastEvaluatedKey);
 
         return Array.from(uniqueBuckets);
     } catch (error) {
         console.error("Error scanning for unique buckets:", error);
-        throw error; 
+        throw error;
     }
 }
 
 async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthDays) {
-    console.log(`Calculating average skill for bucket: ${bucketId}`);
-    let totalSkill = 0;
-    let userCount = 0;
-    let params = {
-        TableName: tableName,
-        ProjectionExpression: "aggregate_skills_season",
-        FilterExpression: "bucket_id = :bucketId",
-        ExpressionAttributeValues: { ":bucketId": bucketId },
-    };
+    // retrieve user_ids from a given bucketID
+    const userIds = getUsersInBucket(tableName, bucketId);
+    const userIdsJSON = JSON.stringify({ user_ids: userIds });
+    const userCount = (await userIds).length;
 
-    console.log(`DynamoDB Query Params: ${JSON.stringify(params)}`);
+    // pass as payload into API call
+    const apiResponse = await makeApiCall("https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate", userIdsJSON);
 
-    try {
-        let scanResponse;
-        do {
-            scanResponse = await documentClient.scan(params).promise();
-            if(scanResponse.Items.length > 0) {
-                scanResponse.Items.forEach(item => {
-                    totalSkill += item.aggregate_skills_season;
-                    userCount += 1;
-                });
-            } else {
-                console.log(`No items found for bucketId ${bucketId}`);
-            }
-            params.ExclusiveStartKey = scanResponse.LastEvaluatedKey; 
-        } while (scanResponse.LastEvaluatedKey);
+    // Extract values and convert them to numbers
+    const values = Object.values(apiResponse).map(value => parseInt(value, 10));
 
-        return userCount > 0 ? (totalSkill / userCount) / seasonLengthDays : 0;
-    } catch (error) {
-        console.error(`Error calculating average skill for bucket ${bucketId}:`, error);
-        throw error;
-    }
+    // Calculate the average
+    const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+
+    console.log("Average:", average);
+
+    return userCount > 0 ? average / seasonLengthDays : 0;
+
+    // console.log(`Calculating average skill for bucket: ${bucketId}`);
+    // let totalSkill = 0;
+    // let userCount = 0;
+    // let params1 = {
+    //     TableName: tableName,
+    //     ProjectionExpression: "aggregate_skills_season",
+    //     FilterExpression: "bucket_id = :bucketId",
+    //     ExpressionAttributeValues: { ":bucketId": bucketId },
+    // };
+
+    // console.log(`DynamoDB Query Params: ${JSON.stringify(params)}`);
+
+    // try {
+    //     let scanResponse;
+    //     do {
+    //         scanResponse = await documentClient.scan(params).promise();
+    //         if (scanResponse.Items.length > 0) {
+    //             scanResponse.Items.forEach(item => {
+    //                 totalSkill += item.aggregate_skills_season;
+    //                 userCount += 1;
+    //             });
+    //         } else {
+    //             console.log(`No items found for bucketId ${bucketId}`);
+    //         }
+    //         params.ExclusiveStartKey = scanResponse.LastEvaluatedKey;
+    //     } while (scanResponse.LastEvaluatedKey);
+
+    //     return userCount > 0 ? (totalSkill / userCount) / seasonLengthDays : 0;
+    // } catch (error) {
+    //     console.error(`Error calculating average skill for bucket ${bucketId}:`, error);
+    //     throw error;
+    // }
 }
 
 
