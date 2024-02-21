@@ -43,9 +43,26 @@ async function prepareAndTriggerChallengeGeneration(event) {
             // console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
         }
 
+        // Get dates for payload
+        const year = currentDate.getFullYear(); // Full year (e.g., 2024)
+        let month = currentDate.getMonth() + 1; // Month (0-11), add 1 to get the correct month (1-12)
+        let day = currentDate.getDate(); // Day of the month (1-31)
+
+        // Add leading zeros if needed
+        if (month < 10) {
+            month = '0' + month;
+        }
+        if (day < 10) {
+            day = '0' + day;
+        }
+
+        // Format the date as "YYYY-MM-DD"
+        const season_start = `${year}-${month}-${day}`;
+        const season_id_string = `season_${year}_${month}`;
+
         const payload = {
-            season_id: "season_2024_02",
-            start_date: "2024-02-01",
+            season_id: season_id_string,
+            start_date: season_start,
             end_date: "2024-02-28",
             buckets: buckets_data,
         };
