@@ -209,14 +209,16 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
 
     // if all zeros, return 0, else filter out zeros
     const updatedValues = allZeros ? [0] : values.filter(value => value !== 0);
-    
+
     // Calculate the average with updated values
     const average = updatedValues.reduce((sum, value) => sum + value, 0) / updatedValues.length;
 
+    // Dev stage: return 2500 meters per day if no data for the bucket
+    average = average ? average : 2.5;
+
     console.log("Average:", average);
 
-    // Dev stage: return 2000 meters per day if no data for the bucket
-    return userCount > 0 ? average / calculateDaysInMonths() : 2000;
+    return userCount > 0 ? average / calculateDaysInMonths() : 0;
 }
 
 
