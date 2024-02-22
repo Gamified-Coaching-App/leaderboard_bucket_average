@@ -214,7 +214,7 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
     let average = updatedValues.reduce((sum, value) => sum + value, 0) / updatedValues.length; // Use 'let' instead of 'const'
 
     // Dev stage: return 2500 meters per day if no data for the bucket
-    average = average ? average : 2500; // Now this line will work without error
+    average = average ? average : 2.5; // Now this line will work without error
 
     console.log("Average:", average);
 
