@@ -29,7 +29,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
 
     try {
         const uniqueBuckets = await getAllUniqueBuckets(tableNameLeaderboard);
-        let bucketsData = [];
+        let buckets = [];
 
         for (const bucket_id of uniqueBuckets) {
             if (!bucket_id) {
