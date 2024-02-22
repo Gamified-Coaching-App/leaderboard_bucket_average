@@ -74,7 +74,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
             season_id: seasonIdString,
             start_date: seasonStart,
             end_date: seasonEnd,
-            buckets: bucketsData,
+            buckets: buckets,
         };
         console.log(payload);
         // JSON.stringify(payload)
