@@ -41,12 +41,12 @@ async function prepareAndTriggerChallengeGeneration(event) {
             const users = await getUsersInBucket(tableNameLeaderboard, bucket_id);
             // console.log(`Users: ${JSON.stringify(users, null, 2)}`);
 
-            bucketsData.push({
+            buckets.push({
                 bucket_id,
                 average_skill: averageSkill,
                 users,
             });
-            //console.log(`Bucket Data Pushed: ${JSON.stringify(bucketsData[bucketsData.length - 1], null, 2)}`);
+            //console.log(`Bucket Data Pushed: ${JSON.stringify(buckets[buckets.length - 1], null, 2)}`);
         }
 
         // Get dates for payload
@@ -71,9 +71,9 @@ async function prepareAndTriggerChallengeGeneration(event) {
         //console.log(seasonIdString, seasonStart, seasonEnd);
 
         const payload = {
-            seasonId: seasonIdString,
-            startDate: seasonStart,
-            endDate: seasonEnd,
+            season_id: seasonIdString,
+            start_date: seasonStart,
+            end_date: seasonEnd,
             buckets: bucketsData,
         };
         console.log(payload);
