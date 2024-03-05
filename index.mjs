@@ -130,7 +130,7 @@ async function makeApiCall(url, payload) {
 
 
 // Function to make a POST request API call
-async function fetchApiData(url, payload) {
+export async function fetchApiData(url, payload) {
 
     try {
         const response = await fetch(url, {
@@ -154,7 +154,7 @@ async function fetchApiData(url, payload) {
     }
 }
 
-async function getAllUniqueBuckets(tableName) {
+export async function getAllUniqueBuckets(tableName) {
     console.log("getAllUniqueBuckets triggered");
     let uniqueBuckets = new Set();
     let params = {
@@ -214,7 +214,7 @@ async function calculateAverageSkillForBucket(tableName, bucketId) {
 }
 
 
-async function getUsersInBucket(tableName, bucketId) {
+export async function getUsersInBucket(tableName, bucketId) {
     console.log("getUsersInBucket triggered");
     const params = {
         TableName: tableName,
