@@ -197,7 +197,9 @@ export async function calculateAverageSkillForBucket(tableName, bucketId) {
     const updatedValues = allZeros ? [0] : values.filter(value => value !== 0);
 
     // Calculate the average with updated values
-    let average = updatedValues.reduce((sum, value) => sum + value, 0) / updatedValues.length; // Use 'let' instead of 'const'
+    let three_month_agg = updatedValues.reduce((sum, value) => sum + value, 0) / updatedValues.length; 
+
+    let average = three_month_agg / calculateDaysInMonths();
 
     if (average<=0.1) {
         // Dev stage: return 2500 meters per day if no data for the bucket
@@ -208,7 +210,7 @@ export async function calculateAverageSkillForBucket(tableName, bucketId) {
         console.log("Bucket average is:", average);
     }
 
-    return userCount > 0 ? average / calculateDaysInMonths() : 0;
+    return userCount > 0 ? average : 0;
 }
 
 export async function getUsersInBucket(tableName, bucketId) {
