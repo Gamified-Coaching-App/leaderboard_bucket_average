@@ -204,10 +204,10 @@ export async function calculateAverageSkillForBucket(tableName, bucketId) {
     if (average<=0.1) {
         // Dev stage: return 2500 meters per day if no data for the bucket
         average = 2.5; // Now this line will work without error
-        console.log("Default average used is:", average);
+        console.log("Default average used is:", average, "for bucket:", bucketId);
     }
     else {
-        console.log("Bucket average is:", average);
+        console.log("Bucket average is:", average, "for bucket:", bucketId);
     }
 
     return userCount > 0 ? average : 0;
