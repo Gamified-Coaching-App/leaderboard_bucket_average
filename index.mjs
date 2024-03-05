@@ -25,7 +25,6 @@ export async function handler(event) {
 async function prepareAndTriggerChallengeGeneration(event) {
     console.log("prepareAndTriggerChallengeGeneration triggered");
     const tableNameLeaderboard = "leaderboard";
-    const seasonLengthDays = 28;
 
     try {
         const uniqueBuckets = await getAllUniqueBuckets(tableNameLeaderboard);
@@ -36,7 +35,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
                 console.error("Encountered undefined bucketId in uniqueBuckets");
                 continue;
             }
-            const averageSkill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucket_id, seasonLengthDays);
+            const averageSkill = await calculateAverageSkillForBucket(tableNameLeaderboard, bucket_id);
             // console.log(`averageSkill: ${JSON.stringify(averageSkill, null, 2)}`);
             const users = await getUsersInBucket(tableNameLeaderboard, bucket_id);
             // console.log(`Users: ${JSON.stringify(users, null, 2)}`);
@@ -54,7 +53,6 @@ async function prepareAndTriggerChallengeGeneration(event) {
         const year = currentDate.getFullYear(); // Full year (e.g., 2024)
         let month = currentDate.getMonth() + 1; // Month (0-11), add 1 to get the correct month (1-12)
         let day = 1; // Day of the month (1-31)
-        const seasonEndDay = day + seasonLengthDays - 1;
 
         // Add leading zeros if needed
         if (month < 10) {
@@ -67,13 +65,10 @@ async function prepareAndTriggerChallengeGeneration(event) {
         const seasonIdString = `season_${year}_${month}`;
         // Format the date as "YYYY-MM-DD"
         const seasonStart = `${year}-${month}-${day}`;
-        const seasonEnd = `${year}-${month}-${seasonEndDay}`;
-        //console.log(seasonIdString, seasonStart, seasonEnd);
 
         const payload = {
             season_id: seasonIdString,
             start_date: seasonStart,
-            end_date: seasonEnd,
             buckets: buckets,
         };
         console.log(payload);
@@ -81,10 +76,7 @@ async function prepareAndTriggerChallengeGeneration(event) {
 
         const apiUrl = 'https://jkipopyatb.execute-api.eu-west-2.amazonaws.com/dev/challenge-creation';
 
-        // Make an API call to trigger challenge creation
         const apiResponse = await makeApiCall(apiUrl, payload);
-        //const apiResponse = await makeApiCall(apiUrl, JSON.stringify(payload));
-        // const apiResponse = await fetchApiData(apiUrl, payload);
         console.log("API call response:", apiResponse);
         return apiResponse;
     } catch (error) {
@@ -185,15 +177,15 @@ async function getAllUniqueBuckets(tableName) {
     }
 }
 
-async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthDays) {
+async function calculateAverageSkillForBucket(tableName, bucketId) {
     console.log("calculateAverageSkillForBucket triggered");
     // retrieve user_ids from a given bucketID
     const userIds = await getUsersInBucket(tableName, bucketId);
     const userIdsJSON = JSON.stringify({ user_ids: userIds });
     const userCount = userIds.length;
-    console.log(userIdsJSON);
-    console.log(userIds);
-    console.log(typeof userIds);
+    // console.log(userIdsJSON);
+    // console.log(userIds);
+    // console.log(typeof userIds);
 
     const apiUrl = "https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate";
 
@@ -202,7 +194,7 @@ async function calculateAverageSkillForBucket(tableName, bucketId, seasonLengthD
 
     // Extract values and convert them to numbers
     const values = Object.values(apiResponse).map(value => parseInt(value, 10));
-    console.log("Values: ", values);
+    // console.log("Values: ", values);
 
     // sheck if all values are zeros
     const allZeros = values.every(value => value === 0);
@@ -256,7 +248,7 @@ function calculateDaysInMonths() {
       totalDays += daysInMonth;
     }
       
-    console.log("Total days in this month and the two months before:", totalDays);
+    // console.log("Total days in this month and the two months before:", totalDays);
     return totalDays;
   }
   

@@ -26,9 +26,14 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies and package Lambda function
-        run: |
-          npm install
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+      
+      - name: Package Lambda function
+        run: 
           zip -r lambda.zip . -x '*.git*'
 
       - name: Configure AWS credentials
