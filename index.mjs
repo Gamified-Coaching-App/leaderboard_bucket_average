@@ -22,7 +22,7 @@ export async function handler(event) {
     };
 }
 
-async function prepareAndTriggerChallengeGeneration(event) {
+export async function prepareAndTriggerChallengeGeneration(event) {
     console.log("prepareAndTriggerChallengeGeneration triggered");
     const tableNameLeaderboard = "leaderboard";
 
@@ -84,9 +84,8 @@ async function prepareAndTriggerChallengeGeneration(event) {
         throw error;
     }
 }
-
 // Function to make a POST request API call
-async function makeApiCall(url, payload) {
+export async function makeApiCall(url, payload) {
     console.log("makeApiCall triggered");
     return new Promise((resolve, reject) => {
         const dataString = JSON.stringify(payload);
@@ -127,7 +126,6 @@ async function makeApiCall(url, payload) {
         req.end();
     });
 }
-
 
 // Function to make a POST request API call
 export async function fetchApiData(url, payload) {
@@ -177,15 +175,12 @@ export async function getAllUniqueBuckets(tableName) {
     }
 }
 
-async function calculateAverageSkillForBucket(tableName, bucketId) {
+export async function calculateAverageSkillForBucket(tableName, bucketId) {
     console.log("calculateAverageSkillForBucket triggered");
     // retrieve user_ids from a given bucketID
     const userIds = await getUsersInBucket(tableName, bucketId);
     const userIdsJSON = JSON.stringify({ user_ids: userIds });
     const userCount = userIds.length;
-    // console.log(userIdsJSON);
-    // console.log(userIds);
-    // console.log(typeof userIds);
 
     const apiUrl = "https://88pqpqlu5f.execute-api.eu-west-2.amazonaws.com/dev_1/3-months-aggregate";
 
@@ -194,7 +189,6 @@ async function calculateAverageSkillForBucket(tableName, bucketId) {
 
     // Extract values and convert them to numbers
     const values = Object.values(apiResponse).map(value => parseInt(value, 10));
-    // console.log("Values: ", values);
 
     // sheck if all values are zeros
     const allZeros = values.every(value => value === 0);
@@ -205,14 +199,17 @@ async function calculateAverageSkillForBucket(tableName, bucketId) {
     // Calculate the average with updated values
     let average = updatedValues.reduce((sum, value) => sum + value, 0) / updatedValues.length; // Use 'let' instead of 'const'
 
-    // Dev stage: return 2500 meters per day if no data for the bucket
-    average = average ? average : 2.5; // Now this line will work without error
-
-    console.log("Average:", average);
+    if (isNaN(average)) {
+        // Dev stage: return 2500 meters per day if no data for the bucket
+        average = 2.5; // Now this line will work without error
+        console.log("Default average used is:", average);
+    }
+    else {
+        console.log("Bucket average is:", average);
+    }
 
     return userCount > 0 ? average / calculateDaysInMonths() : 0;
 }
-
 
 export async function getUsersInBucket(tableName, bucketId) {
     console.log("getUsersInBucket triggered");
@@ -250,5 +247,5 @@ function calculateDaysInMonths() {
       
     // console.log("Total days in this month and the two months before:", totalDays);
     return totalDays;
-  }
+}
   
