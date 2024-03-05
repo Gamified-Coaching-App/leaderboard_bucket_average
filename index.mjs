@@ -199,7 +199,7 @@ export async function calculateAverageSkillForBucket(tableName, bucketId) {
     // Calculate the average with updated values
     let average = updatedValues.reduce((sum, value) => sum + value, 0) / updatedValues.length; // Use 'let' instead of 'const'
 
-    if (isNaN(average)) {
+    if (average<=0.1) {
         // Dev stage: return 2500 meters per day if no data for the bucket
         average = 2.5; // Now this line will work without error
         console.log("Default average used is:", average);
