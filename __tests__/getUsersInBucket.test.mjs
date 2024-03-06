@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import { getUsersInBucket } from '../index.mjs';
+import { getUsersInBucket } from '../utils.mjs';
 
 // Resetting modules to ensure a clean mock state
 beforeEach(() => {

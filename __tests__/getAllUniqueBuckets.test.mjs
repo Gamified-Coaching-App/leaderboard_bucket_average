@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import { getAllUniqueBuckets } from '../index.mjs';
+import { getAllUniqueBuckets } from '../utils.mjs';
 
 // Resetting modules to ensure a clean mock state
 beforeEach(() => {
